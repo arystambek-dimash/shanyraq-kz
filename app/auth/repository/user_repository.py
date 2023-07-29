@@ -49,7 +49,7 @@ class UserRepostitory:
 
     @staticmethod
     def create_user(db: Session, user: UserRequest):
-        db_user = User(email=user.email, phone=user.phone, password=user.password,
+        db_user = User(email=user.email, phone=user.phone[4:], password=user.password,
                        name=user.name, city=user.city)
         db.add(db_user)
         db.commit()
@@ -59,7 +59,7 @@ class UserRepostitory:
 
     @staticmethod
     def update_user(db: Session, user_email, user: UserUpdate):
-        db_update = update(User).where(User.email == user_email).values(phone=user.phone,
+        db_update = update(User).where(User.email == user_email).values(phone=user.phone[4:],
                                                                         name=user.name,
                                                                         city=user.city,
                                                                         )
@@ -71,11 +71,6 @@ class UserRepostitory:
     @staticmethod
     def get_all(db: Session):
         return db.query(User).all()
-
-    @staticmethod
-    def appoint_as_superuser(db: Session, user_id):
-        db.execute(update(User).where(User.id == user_id).values(is_superuser=True))
-        db.commit()
 
     @staticmethod
     def delete_user(db: Session, user_id):

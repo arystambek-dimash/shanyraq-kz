@@ -9,7 +9,7 @@ router = APIRouter(
 )
 
 
-@router.post("/auth/users/",tags=["Register"])
+@router.post("/auth/users/", tags=["Register"])
 async def regis(user: UserRequest, db: Session = Depends(get_db)):
     existing_user = user_repo.get_user_by_email(db, user.email)
     if existing_user and (
@@ -17,11 +17,12 @@ async def regis(user: UserRequest, db: Session = Depends(get_db)):
             existing_user.phone == user.phone
     ):
         raise HTTPException(status_code=400, detail="The phone number or email or username is already taken")
+    user.phone = user.phone.replace(" ", "")
     user_repo.create_user(db, user)
     return {"message": "Successful Authorized"}
 
 
-@router.post("/auth/users/login",tags=["Login"])
+@router.post("/auth/users/login", tags=["Login"])
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
     user = user_repo.get_user_by_email(db, form_data.username)
     if user is None:
@@ -41,7 +42,6 @@ async def profile(user: UserRequest = Depends(get_current_user)):
 async def profile_edit(user_update: UserUpdate,
                        user: UserRequest = Depends(get_current_user),
                        db: Session = Depends(get_db)):
-    if not user_repo.update_user(db, user.email, user_update):
-        raise HTTPException(status_code=404,detail="Not found")
+    user.phone = user.phone.replace(" ", "")
     user_repo.update_user(db, user.email, user_update)
     return {"messages": "successful updated"}

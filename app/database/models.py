@@ -8,12 +8,10 @@ class User(Base):
 
     id = Column(Integer, primary_key=True, index=True)
     email = Column(String, unique=True, index=True)
-    phone = Column(String(32),unique=True,index=True)
+    phone = Column(String(32), unique=True, index=True)
     password = Column(String(32))
     name = Column(String(30))
     city = Column(String(15))
-
-    is_superuser = Column(Boolean, default=False)
 
 
 class Announcement(Base):
@@ -40,4 +38,11 @@ class Comment(Base):
     user_id = Column(Integer, ForeignKey("users.id"))
     announcement_id = Column(Integer, ForeignKey("announcements.id"))
 
-    created_at = Column(TIMESTAMP,default=datetime.now().replace(second=0,microsecond=0))
+    created_at = Column(TIMESTAMP, default=datetime.now().replace(second=0, microsecond=0))
+
+
+class SuperUser(Base):
+    __tablename__ = "superusers"
+    id = Column(Integer,primary_key=True,index=True)
+    user_id = Column(ForeignKey('users.id'))
+
