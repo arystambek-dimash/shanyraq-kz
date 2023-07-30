@@ -4,10 +4,10 @@ from ..announcement.repository.announcement_repository import announcement_repo
 from ..auth.repository.user_repository import UserResponse
 from .repository.comment_repo import CommentRequest, comment_repo
 
-router = APIRouter(prefix="", tags=["Comments"])
+router = APIRouter(prefix="/shanyraks/{id_announcement}", tags=["Comments"])
 
 
-@router.get("/shanyraks/{id_announcement}/comments")
+@router.get("/comments")
 async def get_comment(id_announcement: int,
                       db: Session = Depends(get_db)):
     if id_announcement and announcement_repo.get_announcement_by_id(db, id_announcement):
@@ -15,7 +15,7 @@ async def get_comment(id_announcement: int,
     raise HTTPException(status_code=404, detail="The announcement not found")
 
 
-@router.post("/shanyraks/{id_announcement}/comments")
+@router.post("/comments")
 async def create_comment(id_announcement: int, comment: CommentRequest,
                          current_user: UserResponse = Depends(get_current_user),
                          db: Session = Depends(get_db)):
@@ -25,7 +25,7 @@ async def create_comment(id_announcement: int, comment: CommentRequest,
     raise HTTPException(status_code=404, detail="The announcement not found")
 
 
-@router.patch("/shanyraks/{id_announcement}/comments/{comment_id}")
+@router.patch("/comments/{comment_id}")
 async def update_comment(id_announcement: int, comment_id: int, comment: CommentRequest,
                          current_user: UserResponse = Depends(get_current_user),
                          db: Session = Depends(get_db)):
@@ -41,7 +41,7 @@ async def update_comment(id_announcement: int, comment_id: int, comment: Comment
     raise HTTPException(status_code=404, detail="The comment not found or Ur not user which created the comment")
 
 
-@router.delete("/shanyraks/{id_announcement}/comments/{comment_id}")
+@router.delete("/comments/{comment_id}")
 async def delete_comment(id_announcement: int, comment_id: int,
                          current_user: UserResponse = Depends(get_current_user),
                          db: Session = Depends(get_db)):

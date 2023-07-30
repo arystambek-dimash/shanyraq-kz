@@ -5,10 +5,10 @@ from ..dependencies import get_db, get_current_user
 from ..auth.repository.user_repository import UserResponse
 from ..comment.repository.comment_repo import comment_repo
 
-router = APIRouter(prefix="",tags=["Announcements"])
+router = APIRouter(prefix="/shanyraks",tags=["Announcements"])
 
 
-@router.get("/shanyraks/all")
+@router.get("/all")
 async def get_all_announcements(db: Session = Depends(get_db)):
     announcements = announcement_repo.get_all(db)
     for i in announcements:
@@ -17,7 +17,7 @@ async def get_all_announcements(db: Session = Depends(get_db)):
     return announcements
 
 
-@router.post("/shanyraks/")
+@router.post("/")
 async def create_announcements(announcement: AnnouncementRequest,
                                current_user: UserResponse = Depends(get_current_user),
                                db: Session = Depends(get_db)):
@@ -25,7 +25,7 @@ async def create_announcements(announcement: AnnouncementRequest,
     return {"id": announcement_repo.create_announcement(db, announcement).id}
 
 
-@router.get("/shanyraks/{id_announcement}", response_model=AnnouncementResponse)
+@router.get("/{id_announcement}", response_model=AnnouncementResponse)
 async def get_announcement(id_announcement: int, db: Session = Depends(get_db)):
     announcement = announcement_repo.get_announcement_by_id(db, id_announcement)
     if not announcement:
@@ -34,7 +34,7 @@ async def get_announcement(id_announcement: int, db: Session = Depends(get_db)):
     return announcement
 
 
-@router.patch("/shanyraks/{id_announcement}")
+@router.patch("/{id_announcement}")
 async def update_announcement(id_announcement: int,
                               announcement: AnnouncementRequest,
                               current_user: UserResponse = Depends(get_current_user),
@@ -49,7 +49,7 @@ async def update_announcement(id_announcement: int,
                                                 "the user who placed the announcement")
 
 
-@router.delete("/shanyraks/{id_announcement}")
+@router.delete("/{id_announcement}")
 async def delete_announcement(id_announcement: int,
                               current_user: UserResponse = Depends(get_current_user),
                               db: Session = Depends(get_db)):

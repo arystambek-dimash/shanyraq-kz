@@ -5,10 +5,10 @@ from .repository.superuser_repo import superuser_repo
 
 from sqlalchemy.orm import Session
 
-router = APIRouter(prefix="", tags=["Superuser"])
+router = APIRouter(prefix="/auth/users/superuser", tags=["Superuser"])
 
 
-@router.get("/auth/users/get_users")
+@router.get("/get_users")
 def get_all_users_only_super_user_can(current_user: UserResponse = Depends(get_current_user),
                                       db: Session = Depends(get_db)):
     if current_user.email == "dimash@gmail.com" or current_user.id in superuser_repo.get_all_superuser(db):
@@ -16,15 +16,18 @@ def get_all_users_only_super_user_can(current_user: UserResponse = Depends(get_c
     raise HTTPException(status_code=400, detail="Ur are not superuser")
 
 
-@router.get("/auth/users/get_all_superuser")
+@router.get("/get_all_superuser")
 def get_all_users_only_super_user_can(current_user: UserResponse = Depends(get_current_user),
                                       db: Session = Depends(get_db)):
     if current_user.email == "dimash@gmail.com" or current_user.id in superuser_repo.get_all_superuser(db):
-        return superuser_repo.get_all_superuser(db)
+        superusers = []
+        for i in superuser_repo.get_all_superuser(db):
+            superusers.append(user_repo.get_user_by_id(db,i.user_id))
+        return superusers
     raise HTTPException(status_code=400, detail="Ur are not superuser")
 
 
-@router.post("/auth/users/appoint_as_admin")
+@router.post("/appoint_as_admin")
 def appoint_as_super_user(user_id: int, current_user: UserResponse = Depends(get_current_user),
                           db: Session = Depends(get_db)):
     if (current_user.email == "dimash@gmail.com" or current_user.id in superuser_repo.get_all_superuser(
@@ -34,7 +37,7 @@ def appoint_as_super_user(user_id: int, current_user: UserResponse = Depends(get
     raise HTTPException(status_code=400, detail="Ur are not superuser or the user not in database")
 
 
-@router.delete("/auth/users/delete_user")
+@router.delete("/delete_user")
 def delete_user(user_id: int, current_user: UserResponse = Depends(get_current_user),
                 db: Session = Depends(get_db)):
     if (current_user.email == "dimash@gmail.com" or current_user.id in superuser_repo.get_all_superuser(

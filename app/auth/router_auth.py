@@ -5,11 +5,11 @@ from fastapi.security import OAuth2PasswordRequestForm
 from typing import Annotated
 
 router = APIRouter(
-    prefix="",
+    prefix="/auth/users",
 )
 
 
-@router.post("/auth/users/", tags=["Register"])
+@router.post("/", tags=["Register"])
 async def regis(user: UserRequest, db: Session = Depends(get_db)):
     existing_user = user_repo.get_user_by_email(db, user.email)
     if existing_user and (
@@ -22,7 +22,7 @@ async def regis(user: UserRequest, db: Session = Depends(get_db)):
     return {"message": "Successful Authorized"}
 
 
-@router.post("/auth/users/login", tags=["Login"])
+@router.post("/login", tags=["Login"])
 async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: Session = Depends(get_db)):
     user = user_repo.get_user_by_email(db, form_data.username)
     if user is None:
@@ -33,12 +33,12 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
     return {"access_token": access_token}
 
 
-@router.get("/auth/users/me/", response_model=UserResponse, tags=["Profile"])
+@router.get("/me", response_model=UserResponse, tags=["Profile"])
 async def profile(user: UserRequest = Depends(get_current_user)):
     return user
 
 
-@router.patch("/auth/users/me/", tags=["Profile"])
+@router.patch("/me", tags=["Profile"])
 async def profile_edit(user_update: UserUpdate,
                        user: UserRequest = Depends(get_current_user),
                        db: Session = Depends(get_db)):
