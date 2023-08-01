@@ -1,5 +1,5 @@
 from ...database.models import User
-from pydantic import BaseModel, EmailStr, Field
+from pydantic import BaseModel, EmailStr, Field,ValidationError, validator
 from pydantic_extra_types.phone_numbers import PhoneNumber
 from sqlalchemy.orm import Session
 from sqlalchemy import update, delete

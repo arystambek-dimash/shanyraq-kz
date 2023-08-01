@@ -1,8 +1,11 @@
+from typing import Optional
+
 from fastapi import Depends, HTTPException
 from fastapi.security import OAuth2PasswordBearer
 from sqlalchemy.orm import Session
 from .database.database import SessionLocal
 from jose import jwt
+
 
 from .auth.repository.user_repository import user_repo
 

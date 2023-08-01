@@ -1,20 +1,42 @@
-from fastapi import APIRouter, Depends, HTTPException
+from typing import Optional, List
+from fastapi import APIRouter, Depends, HTTPException, Query
 from sqlalchemy.orm import Session
 from .repository.announcement_repository import announcement_repo, AnnouncementResponse, AnnouncementRequest
 from ..dependencies import get_db, get_current_user
 from ..auth.repository.user_repository import UserResponse
 from ..comment.repository.comment_repo import comment_repo
 
-router = APIRouter(prefix="/shanyraks",tags=["Announcements"])
+router = APIRouter(prefix="/shanyraks", tags=["Announcements"])
 
 
 @router.get("/all")
-async def get_all_announcements(db: Session = Depends(get_db)):
+async def get_all_announcements(
+        limit: int = Query(5, gt=0),
+        offset: int = Query(1, ge=1),
+        type: Optional[str] = Query(None, regex="^(sell|rent)$", examples=['sell', 'rent']),
+        rooms_count: Optional[int] = Query(None, gt=0),
+        price_from: Optional[float] = Query(None, ge=0),
+        price_until: Optional[float] = Query(None, ge=0),
+        db: Session = Depends(get_db)
+):
     announcements = announcement_repo.get_all(db)
-    for i in announcements:
-        if comment_repo.get_comment_by_announcement_id(db, i.id):
-            i.total_comments = comment_repo.get_length_comment(db, i.id)
-    return announcements
+
+    filtered_announcements = [
+        ad for ad in announcements
+        if (not type or ad.type == type) and
+           (not rooms_count or ad.rooms_count == rooms_count) and
+           (not price_from or ad.price >= price_from) and
+           (not price_until or ad.price <= price_until)
+    ]
+
+    total_announcements = len(filtered_announcements)
+    start = (offset - 1) * limit
+    end = offset * limit
+
+    return {
+        "total": total_announcements,
+        "announcements": filtered_announcements[start:end]
+    }
 
 
 @router.post("/")
@@ -45,8 +67,7 @@ async def update_announcement(id_announcement: int,
     if updating_announcement.user_id == current_user.id:
         announcement_repo.update_announcement(db, id_announcement, announcement)
         return {"message": "Successful updated"}
-    raise HTTPException(status_code=404, detail="The flower ID is incorrect or you are not"
-                                                "the user who placed the announcement")
+    raise HTTPException(status_code=404, detail="The user who placed the announcement")
 
 
 @router.delete("/{id_announcement}")

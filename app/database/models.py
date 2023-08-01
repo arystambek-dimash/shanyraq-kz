@@ -46,3 +46,13 @@ class SuperUser(Base):
     id = Column(Integer,primary_key=True,index=True)
     user_id = Column(ForeignKey('users.id'))
 
+
+class Favorite(Base):
+    __tablename__ = "favorites"
+    id = Column(Integer,primary_key=True,index=True)
+    shanyrak_id = Column(ForeignKey('announcements.id'))
+    address = Column(ForeignKey('announcements.address'))
+    user_id = Column(ForeignKey('users.id'))
+
+
+

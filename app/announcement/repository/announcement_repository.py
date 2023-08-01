@@ -65,7 +65,7 @@ class AnnouncementRepository:
             address=announcement.address, area=announcement.area,
             rooms_count=announcement.rooms_count,
             description=announcement.description,
-            )
+        )
 
         db.execute(update_announcement)
         db.commit()
@@ -84,5 +84,6 @@ class AnnouncementRepository:
     @staticmethod
     def get_all(db: Session):
         return db.query(Announcement).all()
+
 
 announcement_repo = AnnouncementRepository()
