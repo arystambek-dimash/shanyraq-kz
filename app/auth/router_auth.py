@@ -12,12 +12,11 @@ router = APIRouter(
 @router.post("/", tags=["Register"])
 async def regis(user: UserRequest, db: Session = Depends(get_db)):
     existing_user = user_repo.get_user_by_email(db, user.email)
-    if existing_user and (
-            existing_user.email == user.email or
-            existing_user.phone == user.phone
-    ):
-        raise HTTPException(status_code=400, detail="The phone number or email or username is already taken")
+    if existing_user:
+        raise HTTPException(status_code=409, detail="The email is already taken")
     user.phone = user.phone.replace(" ", "")
+    if user_repo.get_user_by_phone(db,user.phone[4:]):
+        raise HTTPException(status_code=409, detail="The phone number is already taken")
     user_repo.create_user(db, user)
     return {"message": "Successful Authorized"}
 
@@ -28,7 +27,7 @@ async def login(form_data: Annotated[OAuth2PasswordRequestForm, Depends()], db: 
     if user is None:
         raise HTTPException(status_code=404, detail="The user not found")
     if user.password != form_data.password:
-        raise HTTPException(status_code=404, detail="The password is inccorect")
+        raise HTTPException(status_code=401, detail="The password is inccorect")
     access_token = encode_to_jwt(user.id)
     return {"access_token": access_token}
 

@@ -38,7 +38,7 @@ async def update_comment(id_announcement: int, comment_id: int, comment: Comment
         comment_repo.update_comment(db, announcement_id=id_announcement, user_id=current_user.id, comment_id=comment_id,
                                     comment=comment)
         return {"message": "Comment was successful updated"}
-    raise HTTPException(status_code=404, detail="The comment not found or Ur not user which created the comment")
+    raise HTTPException(status_code=403, detail="Forbidden, You are not the user who created the comment")
 
 
 @router.delete("/comments/{comment_id}")
@@ -53,4 +53,4 @@ async def delete_comment(id_announcement: int, comment_id: int,
     if db_comment.user_id == current_user.id or current_user.is_superuser:
         comment_repo.delete_comment(db, announcement_id=id_announcement, user_id=current_user.id, comment_id=comment_id)
         return {"message": "Comment was successful deleted"}
-    raise HTTPException(status_code=404, detail="The comment not found or ur not the creater")
+    raise HTTPException(status_code=403, detail="U are not the user who created")

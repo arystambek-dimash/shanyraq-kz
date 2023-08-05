@@ -1,8 +1,8 @@
 """changed
 
-Revision ID: efa9c0daf967
+Revision ID: 6cad73297e49
 Revises: 
-Create Date: 2023-08-01 11:11:47.306184
+Create Date: 2023-08-05 21:54:34.530476
 
 """
 from alembic import op
@@ -10,7 +10,7 @@ import sqlalchemy as sa
 
 
 # revision identifiers, used by Alembic.
-revision = 'efa9c0daf967'
+revision = '6cad73297e49'
 down_revision = None
 branch_labels = None
 depends_on = None
@@ -40,7 +40,7 @@ def upgrade() -> None:
     sa.Column('description', sa.String(), nullable=True),
     sa.Column('total_comments', sa.Integer(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_announcements_id'), 'announcements', ['id'], unique=False)
@@ -57,7 +57,7 @@ def upgrade() -> None:
     sa.Column('user_id', sa.Integer(), nullable=True),
     sa.Column('announcement_id', sa.Integer(), nullable=True),
     sa.Column('created_at', sa.TIMESTAMP(), nullable=True),
-    sa.ForeignKeyConstraint(['announcement_id'], ['announcements.id'], ),
+    sa.ForeignKeyConstraint(['announcement_id'], ['announcements.id'], ondelete='CASCADE'),
     sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
     sa.PrimaryKeyConstraint('id')
     )
@@ -67,9 +67,8 @@ def upgrade() -> None:
     sa.Column('shanyrak_id', sa.Integer(), nullable=True),
     sa.Column('address', sa.String(), nullable=True),
     sa.Column('user_id', sa.Integer(), nullable=True),
-    sa.ForeignKeyConstraint(['address'], ['announcements.address'], ),
-    sa.ForeignKeyConstraint(['shanyrak_id'], ['announcements.id'], ),
-    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ),
+    sa.ForeignKeyConstraint(['shanyrak_id'], ['announcements.id'], ondelete='CASCADE'),
+    sa.ForeignKeyConstraint(['user_id'], ['users.id'], ondelete='CASCADE'),
     sa.PrimaryKeyConstraint('id')
     )
     op.create_index(op.f('ix_favorites_id'), 'favorites', ['id'], unique=False)

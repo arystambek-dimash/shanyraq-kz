@@ -19,24 +19,23 @@ async def get_all_announcements(
         price_until: Optional[float] = Query(None, ge=0),
         db: Session = Depends(get_db)
 ):
-    announcements = announcement_repo.get_all(db)
-
-    filtered_announcements = [
-        ad for ad in announcements
-        if (not type or ad.type == type) and
-           (not rooms_count or ad.rooms_count == rooms_count) and
-           (not price_from or ad.price >= price_from) and
-           (not price_until or ad.price <= price_until)
-    ]
-
-    total_announcements = len(filtered_announcements)
     start = (offset - 1) * limit
     end = offset * limit
-
-    return {
-        "total": total_announcements,
-        "announcements": filtered_announcements[start:end]
-    }
+    announcements = announcement_repo.get_all(db)
+    if type or rooms_count or price_from or price_until:
+        filtered_announcements = [
+            ad for ad in announcements
+            if (not type or ad.type == type) and
+               (not rooms_count or ad.rooms_count == rooms_count) and
+               (not price_from or ad.price >= price_from) and
+               (not price_until or ad.price <= price_until)
+        ]
+        total_announcements = len(filtered_announcements)
+        return {
+            "total": total_announcements,
+            "announcements": filtered_announcements[start:end]
+        }
+    return announcements[start:end]
 
 
 @router.post("/")
@@ -67,7 +66,7 @@ async def update_announcement(id_announcement: int,
     if updating_announcement.user_id == current_user.id:
         announcement_repo.update_announcement(db, id_announcement, announcement)
         return {"message": "Successful updated"}
-    raise HTTPException(status_code=404, detail="The user who placed the announcement")
+    raise HTTPException(status_code=403, detail="The user who placed the announcement")
 
 
 @router.delete("/{id_announcement}")
@@ -78,7 +77,6 @@ async def delete_announcement(id_announcement: int,
     if not db_announcement:
         raise HTTPException(status_code=404, detail="The announcement not found")
     if db_announcement.user_id != current_user.id:
-        raise HTTPException(status_code=404, detail="The flower ID is incorrect or you are not"
-                                                    "the user who placed the announcement")
+        raise HTTPException(status_code=404, detail="the user who placed the announcement")
     announcement_repo.delete_announcement(db, id_announcement)
     return {"message": "Successful Deleted"}
