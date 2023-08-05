@@ -10,12 +10,12 @@ from ..announcement.repository.announcement_repository import announcement_repo
 router = APIRouter(prefix="/auth/users/favorites/shanyraks", tags=["Favorites"])
 
 
-@router.get("", response_model=List[FavoriteResponse])
+@router.get("")
 async def get_favorites(current_user: UserResponse = Depends(get_current_user), db: Session = Depends(get_db)):
     favorites = favorite_repo.get_all_favorites(current_user.id, db)
     if not favorites:
         return []
-    return favorites or []
+    return {"shanyraks:":[FavoriteResponse(favorite_id=i.id,shanyrak_id = i.shanyrak_id,address=i.address) for i in favorites]}
 
 
 @router.post("/{announcement_id}")

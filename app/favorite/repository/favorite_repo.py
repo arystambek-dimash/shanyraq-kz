@@ -5,6 +5,7 @@ from ...database.models import Favorite, Announcement
 
 
 class FavoriteResponse(BaseModel):
+    favorite_id:int
     shanyrak_id: int
     address: str
 

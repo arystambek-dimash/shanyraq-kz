@@ -33,9 +33,14 @@ async def get_all_announcements(
         total_announcements = len(filtered_announcements)
         return {
             "total": total_announcements,
-            "announcements": filtered_announcements[start:end]
+            "announcements": [
+                AnnouncementResponse(id=i.id, type=i.type, description=i.description, address=i.address, area=i.area,
+                                     rooms_count=i.rooms_count, price=i.price, user_id=i.user_id,
+                                     total_comments=i.total_comments, ) for i in filtered_announcements[start:end]]
         }
-    return announcements[start:end]
+    return [AnnouncementResponse(id=i.id, type=i.type, description=i.description, address=i.address, area=i.area,
+                                 rooms_count=i.rooms_count, price=i.price, user_id=i.user_id,
+                                 total_comments=i.total_comments, ) for i in announcements[start:end]]
 
 
 @router.post("/")
